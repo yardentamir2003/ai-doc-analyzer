@@ -2,8 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const fs = require('fs');
-
 const app = express();
+const multer = require('multer');
+const pdf = require('pdf-extraction');
+const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 
 // API Initialize model with API key
@@ -60,6 +62,47 @@ app.post('/api/rag', async (req, res) => {
         res.json({ success: true, answer: responseText });
     } catch (error) {
         console.error('Error with RAG endpoint:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
+app.post('/api/ask-pdf', upload.single('document'), async (req, res) => {
+    try {
+        const file = req.file;
+        const userQuestion = req.body.question;
+
+        if (!file) {
+            return res.status(400).json({ error: 'Please upload a PDF file' });
+        }
+        if (!userQuestion) {
+            return res.status(400).json({ error: 'Please provide a question' });
+        }
+
+        
+        const parseFunction = typeof pdf === 'function' ? pdf : (pdf.PDFParse || pdf.default);
+        
+        // Extract text from PDF
+        const pdfData = await pdf(file.buffer);
+        const documentContent = pdfData.text;
+
+        // Constructing the prompt that prevents the model from fabricating information
+        const ragPrompt = `
+        You are a helpful assistant. Answer the user's question based ONLY on the following context.
+        If the answer is not in the context, say "I don't know based on the document."
+
+        Context:
+        ${documentContent}
+
+        Question:
+        ${userQuestion}
+        `;
+
+        // Send request to Gemini
+        const result = await model.generateContent(ragPrompt);
+        res.json({ success: true, answer: result.response.text() });
+
+    } catch (error) {
+        console.error('Error processing PDF:', error);
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 });
