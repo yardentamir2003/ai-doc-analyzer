@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Document Analyzer | Sage RAG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sage-primary: #88a88e;      /* ירוק מרווה עמוק ואלגנטי */
+            --sage-light: #bcd1bf;        /* מרווה בהיר מאוד לרקעים ובועות */
+            --sage-hover: #40564F;        /* גוון כהה יותר לכפתורים במעבר עכבר */
+            --bg-canvas: #FAFAFA;         /* לבן שבור נקי מאוד לרקע הכללי */
+            --text-main: #2C3E35;         /* טקסט כהה המותאם לפלטת הירוקים */
+            --text-light: #7A8B82;        /* טקסט משני */
+            --border-color: #DDE5E0;      /* קווים עדינים */
+            --error-bg: #FDF2F2;
+            --error-text: #D83A3A;
+        }
+
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* סרגל עליון נקי ומרחף */
+        header {
+            padding: 16px 32px;
+            background: #FFFFFF;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--sage-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* עיצוב הכפתור החדש והנקי */
+        .custom-file-btn {
+            background-color: var(--sage-primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'Assistant', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(82, 110, 101, 0.15);
+        }
+
+        .custom-file-btn:hover {
+            background-color: var(--sage-hover);
+        }
+
+        .custom-file-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* אזור הצ'אט נקי ללא מלבנים חוסמים */
+        .chat-box {
+            flex: 1;
+            padding: 30px 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 850px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 14px 20px;
+            border-radius: 16px;
+            line-height: 1.6;
+            font-size: 1.05rem;
+            word-break: break-word;
+            box-shadow: 0 2px 8px rgba(82, 110, 101, 0.04);
+        }
+
+        /* הודעות משתמש בצבע מרווה מלא */
+        .message.user {
+            background: var(--sage-primary);
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* הודעות מערכת/בוט על רקע לבן */
+        .message.bot {
+            background: #FFFFFF;
+            color: var(--text-main);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .message.error {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid #F5C6CB;
+            align-self: center;
+            text-align: center;
+            max-width: 80%;
+            font-size: 0.9rem;
+        }
+
+        /* אזור הקלדה תחתון מעוצב ומרחף */
+        .input-wrapper {
+            background: #FFFFFF;
+            border-top: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .input-area {
+            max-width: 850px;
+            width: 100%;
+            display: flex;
+            gap: 12px;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 8px 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-area:focus-within {
+            border-color: var(--sage-primary);
+            box-shadow: 0 0 0 3px rgba(82, 110, 101, 0.1);
+            background: #FFFFFF;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            font-size: 1rem;
+            font-family: 'Assistant', sans-serif;
+            outline: none;
+            background: transparent;
+            color: var(--text-main);
+            direction: rtl;
+        }
+
+        button.send-btn {
+            background: var(--sage-primary);
+            color: white;
+            border: none;
+            padding: 0 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-family: 'Assistant', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.send-btn:hover {
+            background: var(--sage-hover);
+        }
+
+        button.send-btn:disabled {
+            background: #C2D1C9;
+            cursor: not-allowed;
+        }
+
+        .file-status {
+            font-size: 0.85rem;
+            color: var(--sage-primary);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>
+            <img src="folder.png" alt="Folder Icon" style="width: 38px; height: 38px; vertical-align: middle;">
+            AI Document Analyzer
+        </h1>
+        <div class="upload-section">
+            <input type="file" id="pdfFile" accept=".pdf" style="display: none;">
+            <label for="pdfFile" class="custom-file-btn">
+                📄 בחר קובץ PDF
+            </label>
+            <span id="fileStatus" class="file-status"></span>
+        </div>
+    </header>
+
+    <div class="chat-box" id="chatBox">
+        <div class="message bot">שלום! העלה קובץ PDF בסרגל העליון ושאל אותי כל מה שתרצה על התוכן שלו.</div>
+    </div>
+
+    <div class="input-wrapper">
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="הקלד שאלה על המסמך..." autocomplete="off">
+            <button id="sendBtn" class="send-btn" onclick="sendMessage()">שלח</button>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('pdfFile');
+        const fileStatus = document.getElementById('fileStatus');
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileStatus.textContent = `✓ ${e.target.files[0].name}`;
+            } else {
+                fileStatus.textContent = '';
+            }
+        });
+
+        async function sendMessage() {
+            const question = userInput.value.trim();
+            const file = fileInput.files[0];
+
+            if (!file) {
+                appendMessage('אנא בחר קובץ PDF בסרגל העליון תחילה.', 'error');
+                return;
+            }
+            if (!question) {
+                return;
+            }
+
+            appendMessage(question, 'user');
+            userInput.value = '';
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+
+            const loadingId = appendMessage('מנתח את המסמך...', 'bot');
+
+            const formData = new FormData();
+            formData.append('document', file);
+            formData.append('question', question);
+
+            try {
+                const response = await fetch('/api/ask-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                if (response.ok && data.success) {
+                    appendMessage(data.answer, 'bot');
+                } else {
+                    appendMessage(data.error || 'אירעה שגיאה בשרת.', 'error');
+                }
+            } catch (err) {
+                document.getElementById(loadingId).remove();
+                appendMessage('שגיאת רשת: לא ניתן להתחבר לשרת.', 'error');
+            } finally {
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function appendMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            const msgId = 'msg-' + Date.now() + Math.random();
+            msgDiv.id = msgId;
+            msgDiv.className = `message ${sender}`;
+            msgDiv.textContent = text;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return msgId;
+        }
+    </script>
+</body>
+</html>

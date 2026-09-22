@@ -7,6 +7,7 @@ const multer = require('multer');
 const pdf = require('pdf-extraction');
 const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
+app.use(express.static('public'));
 
 // API Initialize model with API key
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
