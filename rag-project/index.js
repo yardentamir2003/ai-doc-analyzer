@@ -47,7 +47,8 @@ app.post('/api/rag', async (req, res) => {
         // Constructing the prompt that forces the model to rely only on the document
         const ragPrompt = `
         You are a helpful assistant. Answer the user's question based ONLY on the following context.
-        If the answer is not in the context, say "I don't know based on the document."
+        If the answer is not in the context, say "I don't know based on the document.", in the same language 
+        the user asked the question
 
         Context:
         ${documentContent}

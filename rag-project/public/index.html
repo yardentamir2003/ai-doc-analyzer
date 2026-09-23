@@ -7,13 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --sage-primary: #88a88e;      /* ירוק מרווה עמוק ואלגנטי */
-            --sage-light: #bcd1bf;        /* מרווה בהיר מאוד לרקעים ובועות */
-            --sage-hover: #40564F;        /* גוון כהה יותר לכפתורים במעבר עכבר */
-            --bg-canvas: #FAFAFA;         /* לבן שבור נקי מאוד לרקע הכללי */
-            --text-main: #2C3E35;         /* טקסט כהה המותאם לפלטת הירוקים */
-            --text-light: #7A8B82;        /* טקסט משני */
-            --border-color: #DDE5E0;      /* קווים עדינים */
+            --sage-primary: #88a88e;
+            --sage-light: #bcd1bf;
+            --sage-hover: #40564F;
+            --bg-canvas: #FAFAFA;
+            --text-main: #2C3E35;
+            --text-light: #7A8B82;
+            --border-color: #DDE5E0;
             --error-bg: #FDF2F2;
             --error-text: #D83A3A;
         }
@@ -30,7 +30,7 @@
             overflow: hidden;
         }
 
-        /* סרגל עליון נקי ומרחף */
+
         header {
             padding: 16px 32px;
             background: #FFFFFF;
@@ -58,7 +58,7 @@
             color: var(--text-light);
         }
 
-        /* עיצוב הכפתור החדש והנקי */
+        /* Button */
         .custom-file-btn {
             background-color: var(--sage-primary);
             color: white;
@@ -81,7 +81,7 @@
             transform: scale(0.98);
         }
 
-        /* אזור הצ'אט נקי ללא מלבנים חוסמים */
+        /* Chat area */
         .chat-box {
             flex: 1;
             padding: 30px 20px;
@@ -105,7 +105,7 @@
             box-shadow: 0 2px 8px rgba(82, 110, 101, 0.04);
         }
 
-        /* הודעות משתמש בצבע מרווה מלא */
+        /* User messages */
         .message.user {
             background: var(--sage-primary);
             color: white;
@@ -113,7 +113,7 @@
             border-bottom-left-radius: 4px;
         }
 
-        /* הודעות מערכת/בוט על רקע לבן */
+        /* Bot messages */
         .message.bot {
             background: #FFFFFF;
             color: var(--text-main);
@@ -132,7 +132,7 @@
             font-size: 0.9rem;
         }
 
-        /* אזור הקלדה תחתון מעוצב ומרחף */
+        /* Typing area */
         .input-wrapper {
             background: #FFFFFF;
             border-top: 1px solid var(--border-color);
