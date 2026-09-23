@@ -8,13 +8,14 @@ A full-stack Retrieval-Augmented Generation (RAG) web application that allows us
 * **AI Integration:** Implements strict prompt engineering constraints via the `@google/generative-ai` SDK (Gemini), forcing the model to answer user queries **strictly** based on the provided document context.
 
 
-## ⚙️ Prerequisites
-* **Node.js** (v18 or higher recommended)
-* A valid **Google Gemini API Key**
+Running the Application:
+0. open Docker Desktop
 
-## 🛠️ Installation & Setup
+1. change directory to project:
+cd rag-project
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd rag-project
+2. start the docker container:
+docker run -d -p 3000:3000 --env-file .env ai-doc-analyzer
+
+3. Access the application:
+Open your web browser and navigate to http://localhost:3000
